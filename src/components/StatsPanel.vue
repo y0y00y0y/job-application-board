@@ -1,6 +1,7 @@
 <script setup>
 import { computed } from 'vue'
 import { useApplicationsStore, STAGE_LABELS, STAGES } from '@/stores/applications.js'
+import PositionRadar from './PositionRadar.vue'
 
 const store = useApplicationsStore()
 const stats = computed(() => store.stats)
@@ -69,6 +70,8 @@ const funnelRows = computed(() =>
           </div>
         </div>
       </div>
+
+      <PositionRadar />
     </div>
   </section>
 </template>
