@@ -1,0 +1,605 @@
+openapi: "3.0.3"
+
+info:
+  title: 求职申请管理看板 API
+  version: "1.0.0"
+  description: |
+    求职申请管理看板的 RESTful API 规范。
+
+    **当前实现**：所有接口由前端 Pinia Store 在 localStorage 上模拟实现，
+    无真实后端。本文档作为前后端分离时的接口契约，Store action
+    与各接口语义一一对应，切换真实后端时只需替换数据层。
+
+    **Base URL（生产）**：`https://api.job-board.example.com/v1`
+    **Base URL（本地 Mock）**：由 Pinia Store 内部实现，无网络请求
+
+servers:
+  - url: https://api.job-board.example.com/v1
+    description: 生产环境（预留）
+  - url: http://localhost:3000/v1
+    description: 本地开发（预留）
+
+tags:
+  - name: applications
+    description: 求职申请 CRUD 及状态管理
+  - name: stats
+    description: 数据统计与看板概览
+
+# ─── 通用组件 ────────────────────────────────────────────────
+components:
+  schemas:
+
+    StageEnum:
+      type: string
+      enum: [applied, test, interview, offer, rejected]
+      description: |
+        申请阶段枚举
+        - `applied`   已投递
+        - `test`      笔试中
+        - `interview` 面试中
+        - `offer`     已拿 Offer
+        - `rejected`  已拒绝
+
+    PriorityEnum:
+      type: string
+      enum: [high, medium, low]
+      description: |
+        优先级枚举
+        - `high`   高
+        - `medium` 中
+        - `low`    低
+
+    UrgencyEnum:
+      type: string
+      enum: [expired, urgent, warning, safe, none]
+      description: |
+        截止日期紧急程度（派生字段，不存储）
+        - `expired` 已过期
+        - `urgent`  ≤3 天
+        - `warning` 4–7 天
+        - `safe`    >7 天
+        - `none`    无截止日期
+
+    Application:
+      type: object
+      required:
+        - id
+        - company
+        - position
+        - stage
+        - priority
+        - applyDate
+        - createdAt
+        - updatedAt
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+          example: "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
+          description: UUID v4，主键，服务端生成，客户端不可修改
+        company:
+          type: string
+          minLength: 1
+          maxLength: 50
+          example: "字节跳动"
+          description: 公司名称
+        position:
+          type: string
+          minLength: 1
+          maxLength: 100
+          example: "算法工程师"
+          description: 申请岗位
+        stage:
+          $ref: "#/components/schemas/StageEnum"
+        priority:
+          $ref: "#/components/schemas/PriorityEnum"
+        applyDate:
+          type: string
+          format: date
+          example: "2026-04-10"
+          description: 投递日期，格式 YYYY-MM-DD
+        deadline:
+          type: string
+          format: date
+          nullable: true
+          example: "2026-04-22"
+          description: 截止日期，格式 YYYY-MM-DD，无则为 null
+        link:
+          type: string
+          format: uri
+          nullable: true
+          example: "https://jobs.bytedance.com/campus/position/123"
+          description: 招聘原链接，无则为 null
+        notes:
+          type: string
+          maxLength: 500
+          default: ""
+          example: "三面已过，等待 HR 面"
+          description: 备注
+        createdAt:
+          type: string
+          format: date-time
+          readOnly: true
+          example: "2026-04-10T09:00:00.000Z"
+          description: 创建时间，服务端写入，不可修改
+        updatedAt:
+          type: string
+          format: date-time
+          readOnly: true
+          example: "2026-04-18T14:30:00.000Z"
+          description: 最后修改时间，每次更新自动刷新
+
+    ApplicationWithDerived:
+      allOf:
+        - $ref: "#/components/schemas/Application"
+        - type: object
+          properties:
+            daysUntilDeadline:
+              type: integer
+              nullable: true
+              example: 3
+              description: 距截止日期天数（负数表示已过期），无截止日期时为 null
+            urgencyLevel:
+              $ref: "#/components/schemas/UrgencyEnum"
+
+    CreateApplicationRequest:
+      type: object
+      required:
+        - company
+        - position
+        - stage
+        - priority
+        - applyDate
+      properties:
+        company:
+          type: string
+          minLength: 1
+          maxLength: 50
+          example: "字节跳动"
+        position:
+          type: string
+          minLength: 1
+          maxLength: 100
+          example: "算法工程师"
+        stage:
+          $ref: "#/components/schemas/StageEnum"
+        priority:
+          $ref: "#/components/schemas/PriorityEnum"
+        applyDate:
+          type: string
+          format: date
+          example: "2026-04-19"
+        deadline:
+          type: string
+          format: date
+          nullable: true
+          example: "2026-04-22"
+        link:
+          type: string
+          format: uri
+          nullable: true
+          example: null
+        notes:
+          type: string
+          maxLength: 500
+          default: ""
+          example: ""
+
+    UpdateApplicationRequest:
+      type: object
+      description: 所有字段均为可选，仅传入需要修改的字段（PATCH 语义）
+      properties:
+        company:
+          type: string
+          minLength: 1
+          maxLength: 50
+        position:
+          type: string
+          minLength: 1
+          maxLength: 100
+        stage:
+          $ref: "#/components/schemas/StageEnum"
+        priority:
+          $ref: "#/components/schemas/PriorityEnum"
+        applyDate:
+          type: string
+          format: date
+        deadline:
+          type: string
+          format: date
+          nullable: true
+        link:
+          type: string
+          format: uri
+          nullable: true
+        notes:
+          type: string
+          maxLength: 500
+
+    MoveStageRequest:
+      type: object
+      required:
+        - stage
+      properties:
+        stage:
+          $ref: "#/components/schemas/StageEnum"
+
+    Stats:
+      type: object
+      required:
+        - total
+        - byStage
+        - interviewRate
+        - offerCount
+        - urgentCount
+      properties:
+        total:
+          type: integer
+          minimum: 0
+          example: 10
+          description: 全部申请总数
+        byStage:
+          type: object
+          description: 各阶段申请数量
+          properties:
+            applied:
+              type: integer
+              example: 4
+            test:
+              type: integer
+              example: 2
+            interview:
+              type: integer
+              example: 2
+            offer:
+              type: integer
+              example: 1
+            rejected:
+              type: integer
+              example: 1
+        interviewRate:
+          type: number
+          format: float
+          minimum: 0
+          maximum: 1
+          example: 0.3
+          description: 面试转化率，(interview + offer) / total，total=0 时为 0
+        offerCount:
+          type: integer
+          minimum: 0
+          example: 1
+          description: Offer 数量
+        urgentCount:
+          type: integer
+          minimum: 0
+          example: 3
+          description: 截止日期在 7 天内且未拒绝的申请数
+
+    SuccessResponse:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          description: 响应数据，类型随接口而异
+
+    ErrorResponse:
+      type: object
+      required: [success, error]
+      properties:
+        success:
+          type: boolean
+          example: false
+        error:
+          type: object
+          required: [code, message]
+          properties:
+            code:
+              type: string
+              example: "NOT_FOUND"
+            message:
+              type: string
+              example: "申请记录不存在"
+
+  responses:
+    NotFound:
+      description: 资源不存在
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+          example:
+            success: false
+            error:
+              code: "NOT_FOUND"
+              message: "申请记录不存在"
+
+    BadRequest:
+      description: 请求参数非法
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+          example:
+            success: false
+            error:
+              code: "VALIDATION_ERROR"
+              message: "company 不能为空"
+
+    InternalError:
+      description: 服务端内部错误
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+          example:
+            success: false
+            error:
+              code: "INTERNAL_ERROR"
+              message: "存储写入失败"
+
+# ─── 接口定义 ────────────────────────────────────────────────
+paths:
+
+  /applications:
+
+    get:
+      tags: [applications]
+      summary: 获取所有申请列表
+      operationId: fetchApplications
+      description: |
+        返回全部申请记录，按 `createdAt` 降序排列。
+        **Store 对应**：`useApplicationsStore().fetchApplications()`
+      parameters:
+        - in: query
+          name: stage
+          schema:
+            $ref: "#/components/schemas/StageEnum"
+          required: false
+          description: 按阶段筛选，不传则返回全部
+        - in: query
+          name: priority
+          schema:
+            $ref: "#/components/schemas/PriorityEnum"
+          required: false
+          description: 按优先级筛选
+      responses:
+        "200":
+          description: 成功
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/SuccessResponse"
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: "#/components/schemas/ApplicationWithDerived"
+              example:
+                success: true
+                data:
+                  - id: "seed-003"
+                    company: "字节跳动"
+                    position: "算法工程师"
+                    stage: "interview"
+                    priority: "high"
+                    applyDate: "2026-04-10"
+                    deadline: "2026-04-22"
+                    link: null
+                    notes: "已过三面，等待 HR 面"
+                    createdAt: "2026-04-10T09:00:00.000Z"
+                    updatedAt: "2026-04-18T14:00:00.000Z"
+                    daysUntilDeadline: 3
+                    urgencyLevel: "urgent"
+        "500":
+          $ref: "#/components/responses/InternalError"
+
+    post:
+      tags: [applications]
+      summary: 新增申请记录
+      operationId: createApplication
+      description: |
+        创建一条新的申请记录。服务端生成 `id`、`createdAt`、`updatedAt`。
+        **Store 对应**：`useApplicationsStore().createApplication(payload)`
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateApplicationRequest"
+            example:
+              company: "美团"
+              position: "数据科学家"
+              stage: "applied"
+              priority: "high"
+              applyDate: "2026-04-19"
+              deadline: "2026-05-10"
+              link: null
+              notes: ""
+      responses:
+        "201":
+          description: 创建成功
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/SuccessResponse"
+                  - type: object
+                    properties:
+                      data:
+                        $ref: "#/components/schemas/Application"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "500":
+          $ref: "#/components/responses/InternalError"
+
+  /applications/{id}:
+
+    parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: string
+          format: uuid
+        description: 申请记录 UUID
+
+    get:
+      tags: [applications]
+      summary: 获取单条申请详情
+      operationId: getApplicationById
+      description: |
+        按 id 查询单条申请，附带派生字段。
+        **Store 对应**：`useApplicationsStore().getById(id)`
+      responses:
+        "200":
+          description: 成功
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/SuccessResponse"
+                  - type: object
+                    properties:
+                      data:
+                        $ref: "#/components/schemas/ApplicationWithDerived"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+    patch:
+      tags: [applications]
+      summary: 更新申请记录（部分更新）
+      operationId: updateApplication
+      description: |
+        PATCH 语义：只传入需要修改的字段，其余字段保持不变。
+        服务端自动刷新 `updatedAt`。
+        **Store 对应**：`useApplicationsStore().updateApplication(id, patch)`
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateApplicationRequest"
+            example:
+              notes: "二面已过，等待三面"
+              priority: "high"
+      responses:
+        "200":
+          description: 更新成功，返回完整记录
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/SuccessResponse"
+                  - type: object
+                    properties:
+                      data:
+                        $ref: "#/components/schemas/Application"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/InternalError"
+
+    delete:
+      tags: [applications]
+      summary: 删除申请记录
+      operationId: deleteApplication
+      description: |
+        永久删除一条申请记录，不可恢复。
+        **Store 对应**：`useApplicationsStore().deleteApplication(id)`
+      responses:
+        "204":
+          description: 删除成功，无响应体
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/InternalError"
+
+  /applications/{id}/stage:
+
+    patch:
+      tags: [applications]
+      summary: 更新申请阶段（看板拖拽专用）
+      operationId: moveToStage
+      description: |
+        专用于看板列间拖拽时的阶段更新。语义上等价于
+        `PATCH /applications/{id}` 只传 `stage`，但独立成接口
+        以便后端做专项校验（如状态流转合法性检查）。
+        **Store 对应**：`useApplicationsStore().moveToStage(id, stage)`
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: 申请记录 UUID
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/MoveStageRequest"
+            example:
+              stage: "interview"
+      responses:
+        "200":
+          description: 阶段更新成功，返回完整记录
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/SuccessResponse"
+                  - type: object
+                    properties:
+                      data:
+                        $ref: "#/components/schemas/Application"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /stats:
+
+    get:
+      tags: [stats]
+      summary: 获取看板统计数据
+      operationId: getStats
+      description: |
+        返回统计面板所需的全部聚合指标。
+        数据实时计算，不缓存。
+        **Store 对应**：`useApplicationsStore().stats`（computed getter）
+      responses:
+        "200":
+          description: 成功
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/SuccessResponse"
+                  - type: object
+                    properties:
+                      data:
+                        $ref: "#/components/schemas/Stats"
+              example:
+                success: true
+                data:
+                  total: 10
+                  byStage:
+                    applied: 4
+                    test: 2
+                    interview: 2
+                    offer: 1
+                    rejected: 1
+                  interviewRate: 0.3
+                  offerCount: 1
+                  urgentCount: 3
+        "500":
+          $ref: "#/components/responses/InternalError"
