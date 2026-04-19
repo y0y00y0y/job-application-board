@@ -1,18 +1,18 @@
 /* ── Design Tokens ─────────────────────────────────────────── */
 :root {
   /* ── Palette — OKLCH perceptually uniform ── */
-  --color-bg: #f6f4ef;
-  --color-bg: oklch(95% 0.012 80);
-  --color-surface: #fdfcf9;
-  --color-surface: oklch(99.5% 0.004 80);
-  --color-surface-2: #f7f5f0;
-  --color-surface-2: oklch(97% 0.008 80);
-  --color-border: #dedbd3;
-  --color-border: oklch(87% 0.01 80);
-  --color-border-subtle: #ece9e2;
-  --color-border-subtle: oklch(92% 0.007 80);
-  --color-border-focus: #6c63c9;
-  --color-border-focus: oklch(72% 0.14 270);
+  --color-bg: #f7f6f2;
+  --color-bg: oklch(96% 0.01 92);
+  --color-surface: #fffdfa;
+  --color-surface: oklch(99% 0.004 92);
+  --color-surface-2: #f2f0eb;
+  --color-surface-2: oklch(95% 0.007 92);
+  --color-border: #ded9d0;
+  --color-border: oklch(86% 0.012 92);
+  --color-border-subtle: #ebe7df;
+  --color-border-subtle: oklch(91% 0.009 92);
+  --color-border-focus: #7c8f7a;
+  --color-border-focus: oklch(63% 0.07 145);
 
   --color-text-primary: #292522;
   --color-text-primary: oklch(18% 0.012 80);
@@ -24,16 +24,16 @@
   --color-text-inverse: oklch(99% 0 0);
 
   /* Primary — deep slate-indigo (not Tailwind blue) */
-  --color-primary: #5651bb;
-  --color-primary: oklch(50% 0.18 270);
-  --color-primary-hover: #47429e;
-  --color-primary-hover: oklch(44% 0.18 270);
-  --color-primary-active: #38347e;
-  --color-primary-active: oklch(38% 0.18 270);
-  --color-primary-light: #f0efff;
-  --color-primary-light: oklch(96% 0.04 270);
-  --color-primary-subtle: #e5e3ff;
-  --color-primary-subtle: oklch(93% 0.06 270);
+  --color-primary: #667b66;
+  --color-primary: oklch(53% 0.07 145);
+  --color-primary-hover: #566a57;
+  --color-primary-hover: oklch(46% 0.07 145);
+  --color-primary-active: #465649;
+  --color-primary-active: oklch(39% 0.06 145);
+  --color-primary-light: #eef4ed;
+  --color-primary-light: oklch(95% 0.025 145);
+  --color-primary-subtle: #dfeadf;
+  --color-primary-subtle: oklch(90% 0.04 145);
 
   /* Semantic states */
   --color-danger: #d13d32;
@@ -121,8 +121,8 @@
   --shadow-lg: 0 10px 24px -4px oklch(18% 0.012 80 / 0.10), 0 4px 8px -2px oklch(18% 0.012 80 / 0.05);
   --shadow-xl: 0 20px 40px -8px rgb(41 37 34 / 0.14), 0 8px 16px -4px rgb(41 37 34 / 0.06);
   --shadow-xl: 0 20px 40px -8px oklch(18% 0.012 80 / 0.14), 0 8px 16px -4px oklch(18% 0.012 80 / 0.06);
-  --shadow-card-hover: 0 8px 20px -4px rgb(86 81 187 / 0.10), 0 4px 8px -2px rgb(41 37 34 / 0.06);
-  --shadow-card-hover: 0 8px 20px -4px oklch(50% 0.18 270 / 0.10), 0 4px 8px -2px oklch(18% 0.012 80 / 0.06);
+  --shadow-card-hover: 0 8px 20px -4px rgb(102 123 102 / 0.10), 0 4px 8px -2px rgb(41 37 34 / 0.06);
+  --shadow-card-hover: 0 8px 20px -4px oklch(53% 0.07 145 / 0.10), 0 4px 8px -2px oklch(18% 0.012 80 / 0.06);
 
   /* ── Easing — exponential deceleration ── */
   --ease-out-quart: cubic-bezier(0.25, 1, 0.5, 1);
@@ -265,15 +265,13 @@ a { color: inherit; text-decoration: none; }
   display: grid;
   place-items: center;
   padding: var(--sp-8);
-  background:
-    linear-gradient(135deg, rgb(86 81 187 / 0.08), transparent 34%),
-    var(--color-bg);
+  background: var(--color-bg);
 }
 
 .auth-panel {
-  width: min(940px, 100%);
+  width: min(900px, 100%);
   display: grid;
-  grid-template-columns: 1.05fr 0.95fr;
+  grid-template-columns: 0.95fr 1fr;
   gap: var(--sp-8);
   align-items: stretch;
 }
@@ -287,34 +285,35 @@ a { color: inherit; text-decoration: none; }
 }
 
 .auth-kicker {
-  font-family: var(--font-display);
+  font-family: var(--font-body);
   font-size: var(--font-size-md);
-  font-weight: 700;
-  letter-spacing: 0.8px;
+  font-weight: 600;
+  letter-spacing: 0;
   color: var(--color-primary);
-  text-transform: uppercase;
 }
 
 .auth-copy h1 {
-  max-width: 10em;
-  font-family: var(--font-display);
-  font-size: 56px;
-  line-height: 0.95;
-  letter-spacing: -0.5px;
+  max-width: 9em;
+  font-family: var(--font-body);
+  font-size: 46px;
+  line-height: 1.22;
+  letter-spacing: 0;
+  font-weight: 650;
   color: var(--color-text-primary);
 }
 
 .auth-copy p {
-  max-width: 36ch;
-  font-size: var(--font-size-md);
+  max-width: 34ch;
+  font-size: 16px;
+  line-height: 1.8;
   color: var(--color-text-secondary);
 }
 
 .auth-form {
   background: var(--color-surface);
   border: 1px solid var(--color-border);
-  border-radius: var(--radius-xl);
-  box-shadow: var(--shadow-lg);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
   padding: var(--sp-6);
   display: flex;
   flex-direction: column;
@@ -347,6 +346,7 @@ a { color: inherit; text-decoration: none; }
 .auth-submit {
   justify-content: center;
   min-height: 42px;
+  box-shadow: none;
 }
 
 .password-meter {

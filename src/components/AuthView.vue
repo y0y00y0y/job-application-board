@@ -80,10 +80,10 @@ async function onSubmit() {
   <main class="auth-shell">
     <section class="auth-panel" aria-label="账户登录">
       <div class="auth-copy">
-        <span class="auth-kicker">Job Command Center</span>
-        <h1>让每一条申请线都有归处</h1>
+        <span class="auth-kicker">求职申请看板</span>
+        <h1>整理申请，慢慢向前</h1>
         <p>
-          登录后，你的申请记录会保存到云端数据库。换设备、刷新页面、继续跟进，都不会丢。
+          把投递、笔试、面试和截止日期放在一处。少一点慌乱，多一点笃定。
         </p>
       </div>
 
