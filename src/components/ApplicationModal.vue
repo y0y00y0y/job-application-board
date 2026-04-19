@@ -102,7 +102,7 @@ async function onSubmit() {
     if (isEdit.value) {
       await store.updateApplication(props.editTarget.id, payload)
     } else {
-      await store.createApplication(payload)
+      store.createApplication(payload)
     }
     emit('close')
   } catch (e) {

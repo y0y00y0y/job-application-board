@@ -40,7 +40,10 @@ function onDelete(e) {
 <template>
   <div :class="cardClass">
     <div class="app-card__header">
-      <span class="app-card__company">{{ application.company }}</span>
+      <span class="app-card__company">
+        {{ application.company }}
+        <span v-if="application.pending" class="app-card__sync">保存中</span>
+      </span>
       <div class="app-card__actions">
         <button class="btn btn--ghost btn--sm" title="编辑" @click="onEdit">✏️</button>
         <button class="btn btn--danger-ghost btn--sm" title="删除" @click="onDelete">🗑️</button>

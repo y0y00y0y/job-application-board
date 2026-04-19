@@ -110,6 +110,25 @@ function applyColumnOrder(list, stage, orderedIds) {
   })
 }
 
+function optimisticRecord(payload) {
+  const now = new Date().toISOString()
+  return {
+    id: `temp-${crypto.randomUUID()}`,
+    company: payload.company.trim(),
+    position: payload.position.trim(),
+    stage: payload.stage,
+    priority: payload.priority,
+    applyDate: payload.applyDate,
+    deadline: payload.deadline ?? null,
+    link: payload.link ?? null,
+    notes: (payload.notes ?? '').trim(),
+    sortOrder: 0,
+    createdAt: now,
+    updatedAt: now,
+    pending: true,
+  }
+}
+
 export const useApplicationsStore = defineStore('applications', () => {
   const applications = ref([])
   const loading = ref(false)
@@ -171,16 +190,29 @@ export const useApplicationsStore = defineStore('applications', () => {
     return applications.value.find((app) => app.id === id) ?? null
   }
 
-  async function createApplication(payload) {
+  function createApplication(payload) {
     const errors = validatePayload(payload, true)
     if (errors.length > 0) throw new Error(errors.join('; '))
 
-    const created = await apiRequest('/api/applications', {
+    error.value = ''
+    const optimistic = optimisticRecord(payload)
+    applications.value = [optimistic, ...applications.value]
+
+    apiRequest('/api/applications', {
       method: 'POST',
       body: payload,
     })
-    applications.value = [created, ...applications.value]
-    return created
+      .then((created) => {
+        applications.value = applications.value.map((app) =>
+          app.id === optimistic.id ? created : app,
+        )
+      })
+      .catch((e) => {
+        applications.value = applications.value.filter((app) => app.id !== optimistic.id)
+        setError(e)
+      })
+
+    return optimistic
   }
 
   async function updateApplication(id, patch) {
