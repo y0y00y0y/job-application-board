@@ -60,16 +60,16 @@
   --color-success-light: oklch(97% 0.03 155);
 
   /* Stage accents */
-  --color-applied: #66728f;
-  --color-applied: oklch(52% 0.06 255);
-  --color-test: #4e5ec8;
-  --color-test: oklch(55% 0.18 260);
-  --color-interview: #c98314;
-  --color-interview: oklch(68% 0.17 68);
-  --color-offer: #16895a;
-  --color-offer: oklch(55% 0.16 155);
-  --color-rejected: #777d91;
-  --color-rejected: oklch(58% 0.04 250);
+  --color-applied: #78808d;
+  --color-applied: oklch(57% 0.035 250);
+  --color-test: #6d7d9c;
+  --color-test: oklch(58% 0.055 255);
+  --color-interview: #b68b47;
+  --color-interview: oklch(65% 0.075 70);
+  --color-offer: #6d8a6f;
+  --color-offer: oklch(58% 0.06 145);
+  --color-rejected: #8a8580;
+  --color-rejected: oklch(58% 0.018 70);
 
   /* Priority */
   --color-priority-high: #d13d32;
@@ -541,11 +541,11 @@ a { color: inherit; text-decoration: none; }
   min-width: 2px;
 }
 
-.funnel__fill--applied   { background: var(--color-applied); opacity: 0.7; }
-.funnel__fill--test      { background: var(--color-test); opacity: 0.85; }
-.funnel__fill--interview { background: var(--color-interview); }
-.funnel__fill--offer     { background: var(--color-offer); }
-.funnel__fill--rejected  { background: var(--color-rejected); opacity: 0.5; }
+.funnel__fill--applied   { background: var(--color-applied); opacity: 0.55; }
+.funnel__fill--test      { background: var(--color-test); opacity: 0.62; }
+.funnel__fill--interview { background: var(--color-interview); opacity: 0.68; }
+.funnel__fill--offer     { background: var(--color-offer); opacity: 0.7; }
+.funnel__fill--rejected  { background: var(--color-rejected); opacity: 0.42; }
 
 .funnel__num {
   font-family: var(--font-display);
@@ -566,9 +566,10 @@ a { color: inherit; text-decoration: none; }
 
 /* ── Kanban Column ─────────────────────────────────────────── */
 .kanban-column {
-  background: var(--color-surface-2);
+  background: #f7f5f0;
+  background: color-mix(in srgb, var(--color-surface-2) 76%, var(--color-surface) 24%);
   border: 1px solid var(--color-border);
-  border-radius: var(--radius-xl);
+  border-radius: var(--radius-md);
   display: flex;
   flex-direction: column;
   min-height: 240px;
@@ -583,48 +584,47 @@ a { color: inherit; text-decoration: none; }
 .kanban-column__header {
   padding: var(--sp-3) var(--sp-4);
   border-bottom: 1px solid var(--color-border);
-  display: flex;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
   align-items: center;
-  justify-content: space-between;
-  border-radius: var(--radius-xl) var(--radius-xl) 0 0;
-  background: var(--color-surface);
+  gap: var(--sp-2);
+  border-radius: var(--radius-md) var(--radius-md) 0 0;
+  background: transparent;
 }
 
-/* Stage top accent — border-top (not banned) */
-.kanban-column[data-stage="applied"]   .kanban-column__header { border-top: 3px solid var(--color-applied); }
-.kanban-column[data-stage="test"]      .kanban-column__header { border-top: 3px solid var(--color-test); }
-.kanban-column[data-stage="interview"] .kanban-column__header { border-top: 3px solid var(--color-interview); }
-.kanban-column[data-stage="offer"]     .kanban-column__header { border-top: 3px solid var(--color-offer); }
-.kanban-column[data-stage="rejected"]  .kanban-column__header { border-top: 3px solid var(--color-rejected); }
+.kanban-column__dot {
+  width: 7px;
+  height: 7px;
+  border-radius: var(--radius-full);
+  background: var(--color-text-muted);
+}
+
+.kanban-column__dot--applied   { background: var(--color-applied); }
+.kanban-column__dot--test      { background: var(--color-test); }
+.kanban-column__dot--interview { background: var(--color-interview); }
+.kanban-column__dot--offer     { background: var(--color-offer); }
+.kanban-column__dot--rejected  { background: var(--color-rejected); }
 
 .kanban-column__title {
-  font-family: var(--font-display);
+  font-family: var(--font-body);
   font-size: 14px;
-  font-weight: 700;
+  font-weight: 650;
   color: var(--color-text-primary);
-  letter-spacing: 0.5px;
-  text-transform: uppercase;
+  letter-spacing: 0;
 }
 
-/* Stage-colored count badges */
 .kanban-column__badge {
-  font-family: var(--font-display);
+  font-family: var(--font-body);
   font-size: var(--font-size-sm);
-  font-weight: 700;
+  font-weight: 600;
   padding: 2px 8px;
   border-radius: var(--radius-full);
   min-width: 24px;
   text-align: center;
   border: 1px solid var(--color-border);
-  background: var(--color-surface-2);
+  background: rgb(255 253 250 / 0.72);
   color: var(--color-text-muted);
 }
-
-.kanban-column[data-stage="applied"]   .kanban-column__badge { background: oklch(95% 0.018 255); color: var(--color-applied);   border-color: oklch(86% 0.03 255); }
-.kanban-column[data-stage="test"]      .kanban-column__badge { background: oklch(95% 0.055 260); color: var(--color-test);      border-color: oklch(86% 0.09 260); }
-.kanban-column[data-stage="interview"] .kanban-column__badge { background: oklch(97% 0.04 68);   color: oklch(50% 0.15 68);     border-color: oklch(88% 0.065 68); }
-.kanban-column[data-stage="offer"]     .kanban-column__badge { background: oklch(95% 0.04 155);  color: var(--color-offer);     border-color: oklch(86% 0.075 155); }
-.kanban-column[data-stage="rejected"]  .kanban-column__badge { background: oklch(95% 0.01 250);  color: var(--color-rejected);  border-color: oklch(86% 0.02 250); }
 
 .kanban-column__body {
   padding: var(--sp-3);
