@@ -27,10 +27,9 @@ const passwordScore = computed(() =>
 )
 
 const passwordLabel = computed(() => {
-  if (passwordScore.value <= 1) return '偏弱'
-  if (passwordScore.value === 2) return '可用'
-  if (passwordScore.value === 3) return '稳妥'
-  return '很强'
+  if (!form.password) return '至少 8 位，包含字母和数字'
+  if (passwordScore.value < 4) return '还差一点：至少 8 位，包含字母和数字'
+  return '密码格式已满足'
 })
 
 function switchMode(nextMode) {
@@ -132,19 +131,13 @@ async function onSubmit() {
           <span v-if="errors.password" class="form-error">{{ errors.password }}</span>
         </div>
 
-        <div v-if="isRegister" class="password-meter" aria-live="polite">
-          <div class="password-meter__bar">
-            <span :style="{ width: passwordScore * 25 + '%' }" />
-          </div>
-          <span>强度：{{ passwordLabel }}</span>
-        </div>
-
-        <div v-if="isRegister" class="password-rules">
-          <span :class="passwordChecks.length ? 'is-ok' : ''">8 位以上</span>
-          <span :class="passwordChecks.letter ? 'is-ok' : ''">包含字母</span>
-          <span :class="passwordChecks.number ? 'is-ok' : ''">包含数字</span>
-          <span :class="passwordChecks.noSpace ? 'is-ok' : ''">无首尾空格</span>
-        </div>
+        <p
+          v-if="isRegister"
+          :class="['password-hint', passwordScore === 4 ? 'password-hint--ok' : '']"
+          aria-live="polite"
+        >
+          {{ passwordLabel }}
+        </p>
 
         <div v-if="isRegister" class="form-group">
           <label class="form-label form-label--required" for="auth-confirm">确认密码</label>

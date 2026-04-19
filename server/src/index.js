@@ -119,6 +119,7 @@ app.use((err, _req, res, _next) => {
     error: {
       code: status >= 500 ? 'INTERNAL_ERROR' : 'REQUEST_ERROR',
       message: status >= 500 ? '服务器暂时不可用' : err.message,
+      detail: config.isProduction ? undefined : err.message,
     },
   })
 })

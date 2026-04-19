@@ -28,7 +28,7 @@ export async function apiRequest(path, options = {}) {
   const payload = await response.json().catch(() => null)
   if (!response.ok) {
     throw new ApiError(
-      payload?.error?.message ?? '请求失败，请稍后重试',
+      payload?.error?.detail ?? payload?.error?.message ?? '请求失败，请稍后重试',
       response.status,
       payload?.error?.code,
     )

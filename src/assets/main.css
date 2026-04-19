@@ -349,48 +349,15 @@ a { color: inherit; text-decoration: none; }
   box-shadow: none;
 }
 
-.password-meter {
-  display: flex;
-  align-items: center;
-  gap: var(--sp-3);
-  color: var(--color-text-secondary);
-  font-size: var(--font-size-sm);
-}
-
-.password-meter__bar {
-  flex: 1;
-  height: 6px;
-  overflow: hidden;
-  border-radius: var(--radius-full);
-  background: var(--color-border-subtle);
-}
-
-.password-meter__bar span {
-  display: block;
-  height: 100%;
-  border-radius: var(--radius-full);
-  background: var(--color-primary);
-  transition: width var(--transition-base);
-}
-
-.password-rules {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--sp-2);
-}
-
-.password-rules span {
-  padding: 2px 8px;
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-full);
+.password-hint {
+  margin-top: -8px;
   color: var(--color-text-muted);
   font-size: var(--font-size-xs);
+  line-height: 1.6;
 }
 
-.password-rules .is-ok {
-  border-color: var(--color-success);
-  color: var(--color-success);
-  background: var(--color-success-light);
+.password-hint--ok {
+  color: var(--color-primary);
 }
 
 /* Solid primary — no gradient (gradient is an AI tell) */

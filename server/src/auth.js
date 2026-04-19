@@ -74,6 +74,7 @@ export function registerAuthRoutes(app, loginLimiter) {
   })
 
   app.post('/api/auth/register', loginLimiter, async (req, res, next) => {
+    let createdUserId = null
     try {
       const email = normalizeEmail(req.body.email)
       const password = String(req.body.password ?? '')
@@ -98,11 +99,15 @@ export function registerAuthRoutes(app, loginLimiter) {
         'insert into users (id, email, password_hash) values ($1,$2,$3) returning id, email, created_at',
         [userId, email, passwordHash],
       )
+      createdUserId = userId
       await seedApplicationsForUser(userId)
       await createSession(res, userId)
 
       return res.status(201).json({ success: true, data: publicUser(created.rows[0]) })
     } catch (e) {
+      if (typeof createdUserId === 'string') {
+        await query('delete from users where id = $1', [createdUserId]).catch(() => null)
+      }
       return next(e)
     }
   })
