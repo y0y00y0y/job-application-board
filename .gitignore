@@ -10,5 +10,6 @@ dist/
 coverage/
 .agents/
 .claude/
+AGENTS.md
 
 .vercel
