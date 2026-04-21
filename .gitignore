@@ -11,5 +11,11 @@ coverage/
 .agents/
 .claude/
 AGENTS.md
+CLAUDE.md
+PRD.md
+.impeccable.md
+skills-lock.json
 
 .vercel
+api/
+vercel.json
