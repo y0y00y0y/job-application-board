@@ -29,6 +29,12 @@
 
 <img width="2556" height="1394" alt="1f4ad93fd0a8b22df02c424e61a1f19e" src="https://github.com/user-attachments/assets/856223cf-c5e2-449f-805d-7db20e8b2fd4" />
 
+
+拖拽演示：
+
+https://github.com/user-attachments/assets/17db817d-7fa8-48da-a21d-ed87bba05eab
+
+
 当某些申请距离截止日期较近时，页面会给出提醒，帮助我优先处理更紧急的事项。顶部的统计信息可以快速看到当前总申请数、面试进展和不同阶段的分布情况。
 
 ## 适合场景
