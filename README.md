@@ -24,6 +24,7 @@
 
 <img width="2555" height="1398" alt="520a6091a9be5b7379621174f7a34a43" src="https://github.com/user-attachments/assets/1f92beb2-93fa-48d8-a850-cc573334fb38" />
 
+
 首次进入系统后，可以新增自己的求职申请，填写公司、岗位、城市、申请阶段、截止日期、岗位链接和备注等信息。申请会以卡片形式出现在看板中，可以按阶段查看，也可以通过**拖拽**调整进度。
 
 <img width="2556" height="1394" alt="1f4ad93fd0a8b22df02c424e61a1f19e" src="https://github.com/user-attachments/assets/856223cf-c5e2-449f-805d-7db20e8b2fd4" />
