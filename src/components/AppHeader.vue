@@ -13,7 +13,7 @@ const emit = defineEmits(['add', 'logout'])
   <header class="app-header">
     <div class="app-header__brand">
       <span class="app-header__wordmark">求职<span class="app-header__wordmark-accent">看板</span></span>
-      <span class="app-header__tagline">掌控每一条申请进度</span>
+      <span class="app-header__tagline">万物皆有其季节 </span>
     </div>
 
     <div class="app-header__actions">

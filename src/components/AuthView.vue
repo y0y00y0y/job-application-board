@@ -80,9 +80,9 @@ async function onSubmit() {
     <section class="auth-panel" aria-label="账户登录">
       <div class="auth-copy">
         <span class="auth-kicker">求职申请看板</span>
-        <h1>整理申请，慢慢向前</h1>
+        <h1>见证每一份向上的渴望</h1>
         <p>
-          把投递、笔试、面试和截止日期放在一处。少一点慌乱，多一点笃定。
+          每一次投递都是对未来的投石问路。我们帮你整理繁杂的截止日期，让你专注在每一次从容的表达里。
         </p>
       </div>
 

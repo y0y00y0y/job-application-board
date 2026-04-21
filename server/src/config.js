@@ -3,6 +3,7 @@ import dotenv from 'dotenv'
 dotenv.config()
 
 const isProduction = process.env.NODE_ENV === 'production'
+const VERCEL_PREVIEW_ORIGIN = /^https:\/\/[a-z0-9-]+\.vercel\.app$/i
 
 export const config = {
   isProduction,
@@ -14,6 +15,12 @@ export const config = {
     .map((origin) => origin.trim())
     .filter(Boolean),
   cookieSameSite: process.env.COOKIE_SAME_SITE ?? (isProduction ? 'none' : 'lax'),
+}
+
+export function isAllowedOrigin(origin) {
+  if (!origin) return true
+  if (config.clientOrigins.includes(origin)) return true
+  return VERCEL_PREVIEW_ORIGIN.test(origin)
 }
 
 export function assertConfig() {
